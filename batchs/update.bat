@@ -2,3 +2,4 @@
 
 cd C:\yt-songs
 git pull origin main
+pause
