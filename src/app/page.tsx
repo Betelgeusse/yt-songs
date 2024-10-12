@@ -55,12 +55,12 @@ export default function Home() {
         <button onClick={downloadSong} className="col-span-12 my-4 border-4 rounded hover:bg-slate-50">3. Dar click aquí para descargar</button>
         <h1 className="col-span-12">4. La canción se descargará en la carpeta de C:/Canciones</h1>
         <div className="col-span-12 py-8">
+          <h1>Status: {downloadStatus}</h1>
           {isDownloading ? (
             <h1>Descargando canción...</h1>
           ) : (
             <h1>No se está descargando nada por el momento.</h1>
           )}
-          <h1>Status: {downloadStatus}</h1>
         </div>
       </div>
       <div className="border"></div>

@@ -20,7 +20,10 @@ export async function POST(req: Request, res: NextApiResponse<any>) {
   const videoId = params?.v;
   if (!videoId) {
     return NextResponse.json(
-      { message: "No se ha podido leer el video" },
+      {
+        message:
+          "No se ha podido leer el video. Asegúrese de que la url contiene los caracteres watch?. Por ejemplo: https://www.youtube.com/watch?v=dIbeazAlxM4",
+      },
       { status: 404 }
     );
   }
@@ -32,9 +35,12 @@ export async function POST(req: Request, res: NextApiResponse<any>) {
   if (!fs.existsSync(filePath)) {
     fs.mkdirSync(filePath, { recursive: true });
   }
+  const title = video.title
+    .replace(/[\|&;\$%@"<>\(\)\+,/]/g, "")
+    .normalize("NFC");
 
-  const data = ytdl(url, { quality: "highestaudio" }).pipe(
-    fs.createWriteStream(path.resolve(`${filePath}/${video.title}.mp3`))
+  ytdl(url, { quality: "highestaudio" }).pipe(
+    fs.createWriteStream(path.resolve(`${filePath}/${title}.mp3`))
   );
   return NextResponse.json(
     { message: "Canción descargada exitosamente" },
