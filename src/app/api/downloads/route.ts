@@ -43,7 +43,7 @@ export async function POST(req: Request, res: NextApiResponse<any>) {
     fs.createWriteStream(path.resolve(`${filePath}/${title}.mp3`))
   );
   return NextResponse.json(
-    { message: "Canción descargada exitosamente" },
+    { message: `Descarga exitosa de: ${title}` },
     { status: 200 }
   );
 }
