@@ -1,5 +1,5 @@
 @echo off
 
-cd C:\ 
+cd C:\yt-songs
 git pull origin main
 npm run dev

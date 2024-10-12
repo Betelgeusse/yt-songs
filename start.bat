@@ -1,5 +1,5 @@
 @echo off
 
-cd C:\ 
-npm run dev || echo "npm run dev failed"
+cd C:\yt-songs
+npm run dev
 pause
