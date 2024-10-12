@@ -112,7 +112,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <p className="text-md col-span-12 mb-4">Contacto: betelgeussesoftware@gmail.com</p>
+      {/* <p className="text-md col-span-12 mb-4">Contacto: betelgeussesoftware@gmail.com</p> */}
 
     </div>
 
