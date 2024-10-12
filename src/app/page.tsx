@@ -1,5 +1,6 @@
 // import Image from "next/image";
 "use client"
+import { normalizeStr } from "@core/utilities/normalize";
 import { useState } from "react";
 
 export default function Home() {
@@ -29,9 +30,22 @@ export default function Home() {
       })
     });
     const data = await response.json();
-    console.log(data);
     setDownloadStatus(data?.message || 'Estatus desconocido')
     setDownloadingValue(false)
+
+    if(data?.file?.data){
+      const uint8Array = new Uint8Array(data.file.data);
+      const fileBlob = new Blob([uint8Array], { type: data.mime });
+      const objectUrl = URL.createObjectURL(fileBlob);
+      const a: HTMLAnchorElement = document.createElement('a');
+      a.href = objectUrl;
+      const title = normalizeStr(data?.info?.videoDetails?.title)
+      a.download = `${title}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(objectUrl);
+    }
+
   }
 
   return (
