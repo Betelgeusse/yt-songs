@@ -1,23 +1,32 @@
-// import Image from "next/image";
 "use client"
 import { normalizeStr } from "@core/utilities/normalize";
 import { useState } from "react";
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
 export default function Home() {
 
   const [inputValue, setInputValue] = useState("");
   const [isDownloading, setDownloadingValue] = useState(false);
   const [downloadStatus, setDownloadStatus] = useState("En espera");
+  const [isError, setError] = useState(false);
+  const [justDownloaded, setJustDownloadedState] = useState(true);
+
 
   const clearInput = () => {
+    setJustDownloadedState(true);
     setInputValue("");
   }
 
   const downloadSong = async() => {
     if(inputValue.length === 0){
       setDownloadStatus("Ingrese la URL de la canción que desea descargar.")
+      setError(true);
       return;
     }
+    setError(false);
+
+    NProgress.start()
     setDownloadingValue(true)
     setDownloadStatus("Descargando canción.")
     const response = await fetch('/api/downloads', {
@@ -44,41 +53,66 @@ export default function Home() {
       document.body.appendChild(a);
       a.click();
       URL.revokeObjectURL(objectUrl);
+    } else {
+      setDownloadStatus("Ha ocurrido un error desconocido.")
+      setError(true);
     }
-
+    NProgress.done();
+    setJustDownloadedState(false);
+    return;
   }
 
   return (
-    <div className="p-8 flex h-full justify-center items-center gap-4">
-      <div className="border"></div>
+    <div className="p-4">
+        <h1 className="text-3xl col-span-12 mb-4">Descargar Canción</h1>
+    <div className="p-8 border-8 border-gray-200 rounded-2xl h-full justify-center items-center gap-4 shadow-blue-100 shadow-lg">
       <div className="grid grid-cols-12 justify-center">
-        <h1 className="text-3xl col-span-12 py-8">Descargar Canción</h1>
         <h1 className="col-span-12">Pasos:</h1>
         <h1 className="col-span-12">1. Copiar el enlace del video (Ctrl + C)</h1>
-        <h1 className="col-span-2">2. Pegarlo aquí (Ctrl+V):</h1>
+        <h1 className="col-span-2 flex flex-row self-center">2. Pegarlo aquí (Ctrl+V):</h1>
         <input 
           type="text" 
-          className="col-span-9 border rounded-lg border-black"
+          className="col-span-9 border rounded-lg border-black px-4"
           value={inputValue}
+          placeholder="https://www.youtube.com/watch?v=dIbeazAlxM4 <--- Pega tu URL en este campo"
           onChange={(e) => setInputValue(e.target.value)}></input>
         <button 
           className="col-span-1 my-4 border-4 rounded hover:bg-slate-50"
           onClick={clearInput}>
-            Limpiar
+            <p className="text-sm">Limpiar</p>
         </button>
-        <button onClick={downloadSong} className="col-span-12 my-4 border-4 rounded hover:bg-slate-50">3. Dar click aquí para descargar</button>
-        <h1 className="col-span-12">4. La canción se descargará en la carpeta de C:/Canciones</h1>
-        <div className="col-span-12 py-8">
-          <h1>Status: {downloadStatus}</h1>
+        {
+          justDownloaded?
+          <button onClick={downloadSong} className="col-span-12 my-4 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-4 border-2 border-blue-500 hover:border-transparent rounded">
+            3. Click aquí para descargar
+          </button>
+          :
+          <div className="col-span-12 grid grid-cols-12 gap-2">
+            <button onClick={downloadSong} className="col-span-6 my-4 w-full bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-4 border-2 border-blue-500 hover:border-transparent rounded">
+            Descargar de nuevo
+            </button>
+            <button onClick={clearInput} className="col-span-6 my-4 w-full bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-4 border-2 border-blue-500 hover:border-transparent rounded">
+            Descargar canción nueva
+            </button>
+          </div>
+        }
+
+        <div className="col-span-12">
+          <h1>
+            Status:
+            {isError ? <p className="text-red-500">{downloadStatus}</p> : <p>{downloadStatus}</p>}
+          </h1>
           {isDownloading ? (
-            <h1>Descargando canción...</h1>
+            <h1>En unos momentos se descargará la canción.</h1>
           ) : (
             <h1>No se está descargando nada por el momento.</h1>
           )}
+          
         </div>
       </div>
-      <div className="border"></div>
     </div>
+    </div>
+
 
   );
 }
