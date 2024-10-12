@@ -93,7 +93,7 @@ export default function Home() {
                   Descargar de nuevo
                 </button>
                 <button onClick={clearInput} className="col-span-6 my-4 w-full bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-4 border-2 border-blue-500 hover:border-transparent rounded">
-                  Descargar canción nueva
+                  Descargar otra canción
                 </button>
               </div>
           }
@@ -112,7 +112,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <p className="text-md col-span-12 mb-4">Contact: betelgeussesoftware@gmail.com</p>
+      <p className="text-md col-span-12 mb-4">Contacto: betelgeussesoftware@gmail.com</p>
 
     </div>
 
