@@ -11,11 +11,19 @@ export default function Home() {
   const [downloadStatus, setDownloadStatus] = useState("En espera");
   const [isError, setError] = useState(false);
   const [userCanDownload, setUserCanDownloadStatus] = useState(true);
-
+  const [browserDownload, setBrowserDownloadValue] = useState(false);
 
   const clearInput = () => {
     setUserCanDownloadStatus(true);
     setInputValue("");
+  }
+
+  const setBrowserDownload = (): any => {
+    setBrowserDownloadValue(true)
+  }
+
+  const setOSDownload = (): any => {
+    setBrowserDownloadValue(false)
   }
 
   const downloadSong = async () => {
@@ -35,14 +43,16 @@ export default function Home() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        url: inputValue
+        url: inputValue,
+        saveFile: !browserDownload
       })
     });
     const data = await response.json();
     setDownloadStatus(data?.message || 'Estatus desconocido')
     setDownloadingValue(false)
 
-    if (data?.file?.data) {
+
+    if (data?.file?.data && browserDownload) {
       const uint8Array = new Uint8Array(data.file.data);
       const fileBlob = new Blob([uint8Array], { type: data.mime });
       const objectUrl = URL.createObjectURL(fileBlob);
@@ -53,10 +63,11 @@ export default function Home() {
       document.body.appendChild(a);
       a.click();
       URL.revokeObjectURL(objectUrl);
-    } else {
-      setDownloadStatus(data?.message || "Ha ocurrido un error desconocido.")
+    }
+    if (!data?.file?.data && browserDownload) {
       setError(true);
     }
+    setDownloadStatus(data?.message || "Ha ocurrido un error desconocido.")
     NProgress.done();
     setUserCanDownloadStatus(false);
     return;
@@ -68,6 +79,22 @@ export default function Home() {
       <div className="p-8 border-8 border-gray-200 rounded-2xl h-full justify-center items-center gap-4 shadow-blue-100 shadow-lg">
         <div className="grid grid-cols-12 justify-center">
           <h1 className="col-span-12">Pasos:</h1>
+          <h1 className="col-span-12">1. Selecciona donde deseas descargar la canción:</h1>
+          <div className="col-span-12 grid grid-cols-12 gap-x-4 mb-4">
+            <button
+              className="col-span-6 border-4 rounded hover:bg-slate-50"
+              onClick={setBrowserDownload}>
+              <p className="text-sm">Yo decido donde guardar</p>
+            </button>
+            <button
+              className="col-span-6 border-4 rounded hover:bg-slate-50"
+              onClick={setOSDownload}>
+              <p className="text-sm">Guardar directamente en C:/Canciones</p>
+            </button>
+
+            <i className="text-sm col-span-12">Seleccionó: {(browserDownload) ? 'Yo decido donde guardar' : 'Guardando directamente en C:/Canciones'}:</i>
+          </div>
+
           <h1 className="col-span-12">1. Copiar el enlace del video (Ctrl + C)</h1>
           <h1 className="col-span-2 flex flex-row self-center">2. Pegarlo aquí (Ctrl+V):</h1>
           <input

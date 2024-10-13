@@ -1,6 +1,10 @@
+import path from "path";
+import os from "os";
+import fs from "fs";
 import type { NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import ytdl, { getInfo } from "@distube/ytdl-core";
+import { normalizeStr } from "@core/utilities/normalize";
 
 export async function POST(req: Request, res: NextApiResponse<any>) {
   const body = await req.json();
@@ -23,8 +27,20 @@ export async function POST(req: Request, res: NextApiResponse<any>) {
   }
 
   const result = await streamToBuffer(ytdl(url, { quality: "highestaudio" }));
-
   const info = await getInfo(videoId);
+  const title = info?.videoDetails.title;
+
+  if (body?.saveFile) {
+    const filePath = path.resolve(os.homedir(), "/Canciones");
+    if (!fs.existsSync(filePath)) {
+      fs.mkdirSync(filePath, { recursive: true });
+    }
+    ytdl(url, { quality: "highestaudio" }).pipe(
+      fs.createWriteStream(
+        path.resolve(`${filePath}/${normalizeStr(title)}.mp3`)
+      )
+    );
+  }
 
   return NextResponse.json(
     {
@@ -52,13 +68,3 @@ async function streamToBuffer(stream: any) {
     });
   });
 }
-
-// To do it locally:
-// const filePath = path.resolve(os.homedir(), "/Canciones");
-// if (!fs.existsSync(filePath)) {
-//   fs.mkdirSync(filePath, { recursive: true });
-// }
-
-// ytdl(url, { quality: "highestaudio" }).pipe(
-//   fs.createWriteStream(path.resolve(`${filePath}/${title}.mp3`))
-// );
